@@ -1,0 +1,40 @@
+@"
+# Environnements virtuels (CRITIQUE)
+env_prix_maison/
+venv_mlops/
+venv/
+ENV/
+env/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# MLflow
+mlruns/
+mlflow_artifacts/
+
+# Logs
+*.log
+reports/logs/
+
+# Données volumineuses
+data/raw/*.csv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests
+.pytest_cache/
+.coverage
+"@ | Out-File -FilePath .gitignore -Encoding utf8

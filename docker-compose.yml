@@ -1,0 +1,179 @@
+version: '3.8'
+
+# =================================================================
+# Docker Compose MLOps - Phase 2
+# Services: API + MLflow UI + Reverse Proxy
+# =================================================================
+
+services:
+  # Service principal - API MLOps
+  mlops-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: mlops-api
+    restart: unless-stopped
+    
+    # Variables d'environnement
+    environment:
+      - MLOPS_ENV=${MLOPS_ENV:-production}
+      - API_PORT=${API_PORT:-8000}
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - PYTHONPATH=/app
+    
+    # Ports exposés
+    ports:
+      - "${API_PORT:-8000}:8000"
+    
+    # Volumes persistants
+    volumes:
+      # Données persistantes
+      - mlops_data:/app/data
+      - mlops_models:/app/models
+      - mlops_logs:/app/reports/logs
+      # Configuration (lecture seule)
+      - ./config:/app/config:ro
+      # MLflow partagé
+      - mlruns_data:/app/mlruns
+      - mlflow_artifacts:/app/mlflow_artifacts
+    
+    # Dépendances
+    depends_on:
+      - mlflow
+    
+    # Réseau
+    networks:
+      - mlops-network
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    # Ressources
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # Service MLflow UI
+  mlflow:
+    image: python:3.11-slim
+    container_name: mlflow-ui
+    restart: unless-stopped
+    
+    # Commande pour démarrer MLflow UI
+    command: >
+      bash -c "
+        pip install mlflow==2.8.1 &&
+        mlflow ui 
+          --backend-store-uri /mlruns 
+          --default-artifact-root /mlflow_artifacts
+          --host 0.0.0.0 
+          --port 5000
+      "
+    
+    # Ports exposés
+    ports:
+      - "${MLFLOW_PORT:-5000}:5000"
+    
+    # Volumes partagés avec l'API
+    volumes:
+      - mlruns_data:/mlruns
+      - mlflow_artifacts:/mlflow_artifacts
+    
+    # Réseau
+    networks:
+      - mlops-network
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Service Nginx (optionnel - pour la production)
+  nginx:
+    image: nginx:alpine
+    container_name: mlops-nginx
+    restart: unless-stopped
+    
+    # Configuration Nginx
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    
+    # Ports exposés
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    
+    # Dépendances
+    depends_on:
+      - mlops-api
+      - mlflow
+    
+    # Réseau
+    networks:
+      - mlops-network
+    
+    # Profil pour activer seulement en production
+    profiles:
+      - production
+
+# =================================================================
+# Volumes persistants
+# =================================================================
+volumes:
+  # Données MLOps
+  mlops_data:
+    driver: local
+    name: mlops_data
+  
+  # Modèles entraînés
+  mlops_models:
+    driver: local
+    name: mlops_models
+  
+  # Logs applicatifs
+  mlops_logs:
+    driver: local
+    name: mlops_logs
+  
+  # MLflow tracking data
+  mlruns_data:
+    driver: local
+    name: mlruns_data
+  
+  # MLflow artifacts
+  mlflow_artifacts:
+    driver: local
+    name: mlflow_artifacts
+
+# =================================================================
+# Réseaux
+# =================================================================
+networks:
+  mlops-network:
+    driver: bridge
+    name: mlops-network
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# =================================================================
+# Configuration par défaut
+# =================================================================
+# Variables d'environnement disponibles:
+# - MLOPS_ENV: development|staging|production (défaut: production)
+# - API_PORT: Port de l'API (défaut: 8000)
+# - MLFLOW_PORT: Port MLflow UI (défaut: 5000)
+# - NGINX_PORT: Port Nginx (défaut: 80)

@@ -1,0 +1,50 @@
+# Configuration du modèle Gradient Boosting
+algorithm: "GradientBoostingRegressor"
+enabled: true
+description: "Gradient Boosting avec régularisation pour éviter l'overfitting"
+
+# Hyperparamètres
+hyperparameters:
+  n_estimators: 50
+  max_depth: 4
+  learning_rate: 0.05
+  subsample: 0.8
+  max_features: "sqrt"
+  random_state: 42
+  loss: "squared_error"
+  alpha: 0.9  # Quantile pour la perte huber
+
+# Méta-informations
+meta:
+  author: "MLOps Team"
+  created_date: "2025-01-24"
+  last_modified: "2025-01-24"
+  version: "1.1"
+  
+# Critères de performance
+performance_criteria:
+  min_r2_score: 0.45
+  max_rmse: 290000
+  max_training_time_seconds: 120
+
+# Grille d'hyperparamètres pour l'optimisation
+hyperparameter_grid:
+  n_estimators: [30, 50, 100]
+  max_depth: [3, 4, 6]
+  learning_rate: [0.01, 0.05, 0.1, 0.2]
+  subsample: [0.7, 0.8, 0.9]
+  max_features: ["sqrt", "log2", None]
+
+# Configuration d'early stopping
+early_stopping:
+  enabled: true
+  monitor: "validation_score"
+  patience: 10
+  min_delta: 0.001
+
+# Tags pour MLflow
+tags:
+  model_type: "boosting"
+  complexity: "high"
+  interpretability: "medium"
+  speed: "slow"

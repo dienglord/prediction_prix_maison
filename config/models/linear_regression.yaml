@@ -1,0 +1,29 @@
+# Configuration du modèle Linear Regression
+algorithm: "LinearRegression"
+enabled: true
+description: "Régression linéaire simple et rapide - Modèle de référence"
+
+# Hyperparamètres (normalize supprimé - obsolète dans scikit-learn récent)
+hyperparameters:
+  fit_intercept: true
+
+# Méta-informations
+meta:
+  author: "MLOps Team"
+  created_date: "2025-01-24"
+  last_modified: "2025-01-24"
+  version: "1.1"
+  note: "Parameter 'normalize' removed - deprecated in scikit-learn 1.2+"
+  
+# Critères de performance
+performance_criteria:
+  min_r2_score: 0.4
+  max_rmse: 300000
+  max_training_time_seconds: 10
+
+# Tags pour MLflow
+tags:
+  model_type: "baseline"
+  complexity: "low"
+  interpretability: "high"
+  speed: "fast"

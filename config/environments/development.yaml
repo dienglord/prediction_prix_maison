@@ -1,0 +1,70 @@
+# Configuration Environnement Development - Optimisé GitHub
+# Seulement Linear Regression (le meilleur modèle)
+environment: development
+debug: true
+
+# Configuration des données
+data:
+  raw_path: "data/raw/data.csv"
+  processed_path: "data/processed"
+  test_size: 0.2
+  val_size: 0.1
+  random_state: 42
+  
+  # Features pour l'API (11 features optimales)
+  features: [
+    "bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors",
+    "waterfront", "view", "condition", "sqft_above", "sqft_basement", "yr_built"
+  ]
+
+# Configuration API
+api:
+  host: "0.0.0.0"
+  port: 8000
+  version: "2.0.0-optimized"
+  reload: true
+  log_level: "debug"
+
+# Configuration MLflow - Légère
+mlflow:
+  tracking_uri: "./mlruns"
+  experiment_name: "prediction_prix_maison_dev_optimized"
+  artifact_location: "./mlflow_artifacts"
+  log_models: false  # Désactivé pour économiser l'espace
+  auto_log: false    # Désactivé pour économiser l'espace
+
+# Configuration des modèles - SEULEMENT LINEAR REGRESSION
+models:
+  enabled_models: ["linear_regression"]  # Seulement le meilleur
+  
+  # Model paths
+  model_paths:
+    preprocesseur: "models/preprocesseur.pkl"
+    best_model: "models/modele_linear_regression_development.pkl"
+
+# Configuration du logging - Optimisé
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_enabled: true
+  file_path: "reports/logs"
+  file_max_size: "10MB"  # Limite la taille des logs
+  console_enabled: true
+  structured_logging: true
+
+# Méta-informations
+meta:
+  project_name: "MLOps Prix Maisons - Optimisé"
+  version: "2.0-github-optimized"
+  description: "Version optimisée pour GitHub avec seulement Linear Regression"
+  author: "MLOps Team"
+  created_date: "2025-01-24"
+  optimized_date: "2025-07-24"
+  
+  # Informations sur l'optimisation
+  optimization:
+    reason: "Réduction taille pour GitHub"
+    models_removed: ["random_forest", "gradient_boosting"]
+    best_model_kept: "linear_regression"
+    space_saved: "~95% (de ~50MB à ~2MB)"
+    performance_impact: "Aucun (meilleur modèle gardé)"

@@ -1,0 +1,44 @@
+# Configuration du modèle Random Forest
+algorithm: "RandomForestRegressor"
+enabled: true
+description: "Random Forest optimisé pour éviter le surapprentissage"
+
+# Hyperparamètres
+hyperparameters:
+  n_estimators: 100
+  max_depth: 8
+  min_samples_split: 5
+  min_samples_leaf: 2
+  max_features: "sqrt"
+  random_state: 42
+  n_jobs: -1
+  bootstrap: true
+  oob_score: true
+
+# Méta-informations
+meta:
+  author: "MLOps Team"
+  created_date: "2025-01-24"
+  last_modified: "2025-01-24"
+  version: "1.2"
+  
+# Critères de performance
+performance_criteria:
+  min_r2_score: 0.45
+  max_rmse: 280000
+  max_training_time_seconds: 60
+
+# Grille d'hyperparamètres pour l'optimisation
+hyperparameter_grid:
+  n_estimators: [50, 100, 200]
+  max_depth: [5, 8, 10, 15]
+  min_samples_split: [2, 5, 10]
+  min_samples_leaf: [1, 2, 4]
+  max_features: ["sqrt", "log2", 0.3]
+
+# Tags pour MLflow
+tags:
+  model_type: "ensemble"
+  complexity: "medium"
+  interpretability: "medium"
+  speed: "medium"
